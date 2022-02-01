@@ -1,2 +1,0 @@
-C:/Users/mark.barbaric/Documents/Mirriad/Developer/CPP/OpenCV/Starter/cmake/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/mark.barbaric/Documents/Mirriad/Developer/CPP/OpenCV/Starter/cmake/cmake-build-debug/CMakeFiles/rebuild_cache.dir
