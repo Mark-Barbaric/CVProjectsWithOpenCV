@@ -1,0 +1,18 @@
+"C:\Program Files\JetBrains\CLion 2021.2\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - NMake Makefiles" C:\Users\mark.barbaric\Documents\Mirriad\Developer\CPP\OpenCV\Starter\cmake
+-- OpenCV ARCH: x86
+-- OpenCV RUNTIME: 
+-- OpenCV STATIC: ON
+CMake Warning at cmake-modules/FindOpenCV.cmake:166 (message):
+  Found OpenCV Windows Pack but it has no binaries compatible with your
+  configuration.
+
+  You should manually point CMake variable OpenCV_DIR to your build of OpenCV
+  library.
+Call Stack (most recent call first):
+  CMakeLists.txt:6 (FIND_PACKAGE)
+
+
+OpenCV version : 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/mark.barbaric/Documents/Mirriad/Developer/CPP/OpenCV/Starter/cmake/cmake-build-debug
