@@ -3,3 +3,6 @@ Debug/
 Release/
 x64/
 x86/
+build/
+.idea/
+cmake-build-debug/
