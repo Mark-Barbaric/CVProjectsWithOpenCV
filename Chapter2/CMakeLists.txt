@@ -8,3 +8,6 @@ MESSAGE("OpenCV : version: ${OpenCV_Version}")
 
 ADD_EXECUTABLE(OpenCVCMake main.cpp)
 TARGET_LINK_LIBRARIES(OpenCVCMake ${OpenCV_LIBS})
+
+ADD_EXECUTABLE(Chapter2_01 main2.cpp ReadWrite.h)
+TARGET_LINK_LIBRARIES(Chapter2_01 ${OpenCV_LIBS})

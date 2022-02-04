@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]){
 
-    cv::Mat image = cv::imread("../../lena.jpg");
+    cv::Mat image = cv::imread("lena.jpg");
     int myRow = 511;
     int myCol = 511;
     int B = *(image.data+myRow*image.cols*image.channels() + myCol + 0);
