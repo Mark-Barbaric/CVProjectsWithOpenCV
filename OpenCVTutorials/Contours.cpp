@@ -29,7 +29,10 @@ int main(int argc, char* argv[]){
     const int maxThreshold = 255;
     cv::createTrackbar("Canny thresh:", sourceWindow, &thresh, maxThreshold, threshCallback);
     threshCallback(0,0);
-    cv::waitKey();
+
+    while(cv::waitKey() != 27){
+
+    }
     return 0;
 }
 
@@ -60,6 +63,6 @@ void threshCallback(int, void*){
         cv::circle(drawing, centers[i], static_cast<int>(radius[i]), color, 2);
     }
 
-    cv::imshow("Contours", drawing);    
+    cv::imshow("Contours", drawing);
 }
 
