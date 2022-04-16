@@ -1,4 +1,5 @@
 #pragma once
+#include <opencv2/imgproc.hpp>
 
 namespace ObjectDetection{
 
@@ -6,7 +7,7 @@ namespace ObjectDetection{
 
     public:
         Preprocessing();
-        void removeNoise();
+        static cv::Mat removeNoise(const cv::Mat& image);
 
     };
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 #include <ObjectDetection/Preprocessing.h>
 
 constexpr char* keys ={
@@ -13,15 +14,25 @@ constexpr char* keys ={
 int main(int argc, char* argv[])
 {
     cv::CommandLineParser parser(argc, argv, keys);
-    ObjectDetection::Preprocessing preprocessing;
 
     if(parser.has("help")){
         parser.printMessage();
         return 0;
     }
 
+    if(parser.get<cv::String>(0).empty()){
+        return -1;
+    }
+
     const auto imageFile = parser.get<cv::String>(0);
-    const auto lightPatternFile = parser.get<cv::String>(0);
+    const auto image = cv::imread(imageFile, 0);
+    const auto imageNoise = ObjectDetection::Preprocessing::removeNoise(image);
+
+    cv::imshow("Image Noise", imageNoise);
+
+    if(27 == cv::waitKey()){
+        return 0;
+    }
 
     return 0;
 }
