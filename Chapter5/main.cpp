@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
+#include <ObjectDetection/Preprocessing.h>
 
 constexpr char* keys ={
                 "{help h usage ? | | print this message}"
@@ -12,6 +13,7 @@ constexpr char* keys ={
 int main(int argc, char* argv[])
 {
     cv::CommandLineParser parser(argc, argv, keys);
+    ObjectDetection::Preprocessing preprocessing;
 
     if(parser.has("help")){
         parser.printMessage();
