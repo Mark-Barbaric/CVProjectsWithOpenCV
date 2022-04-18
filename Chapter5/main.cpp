@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <ObjectDetection/Preprocessing.h>
 
+//https://github.com/PacktPublishing/Building-Computer-Vision-Projects-with-OpenCV4-and-CPlusPlus/blob/master/Chapter05/main.cpp
 constexpr auto imageFolder = "/Users/markbarbaric/Documents/Developer/CPP/OpenCV/CVProjectsWithOpenCV/Images/";
 
 constexpr char* keys ={

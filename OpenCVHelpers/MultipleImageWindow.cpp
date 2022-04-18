@@ -24,12 +24,12 @@ namespace OpenCVHelpers{
         cv::imshow(m_windowTitle, m_canvas);
     }
 
-    int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool render)
+    int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool reRender)
     {
         m_windowTitles.push_back(std::move(windowTitle));
         m_images.push_back(image);
 
-        if(render){
+        if(reRender){
             render();
         }
 
@@ -56,6 +56,35 @@ namespace OpenCVHelpers{
 
         for(auto it = m_images.begin(); it != m_images.end(); ++it){
 
+            const auto title= *titlesBegin;
+            int cell_x= (cellWidth)*((i)%m_cols);
+            int cell_y= (cellHeight)*floor((i)/(float)m_cols);
+            cv::Rect mask(cell_x, cell_y, cellWidth, cellHeight);
+            // Draw a rectangle for each cell mat
+            rectangle(m_canvas, cv::Rect(cell_x, cell_y, cellWidth, cellHeight), cv::Scalar(200,200,200), 1);
+            //For each cell draw an image if exists
+            cv::Mat cell(m_canvas, mask);
+            // resize image to cell size
+            cv::Mat resized;
+            double cell_aspect= (double)cellWidth/(double)cellHeight;
+            cv::Mat img= *it;
+            double img_aspect= (double)img.cols/(double)img.rows;
+            double f=(cell_aspect<img_aspect)?(double)cellWidth/(double)img.cols:(double)cellHeight/(double)img.rows;
+            resize(img, resized, cv::Size(0,0), f, f);
+            if(resized.channels()==1){
+                cvtColor(resized, resized, cv::COLOR_GRAY2BGR);
+            }
+
+            // Assign the image
+            cv::Mat sub_cell(m_canvas, cv::Rect(cell_x,cell_y,resized.cols, resized.rows));
+            resized.copyTo(sub_cell);
+            putText(cell, title.c_str(), cv::Point(20,20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(200,0,0), 1, cv::LINE_AA);
+            i++;
+            ++titlesBegin;
+
+            if(i == maxImages){
+                break;
+            }
         }
 
         imshow(m_windowTitle, m_canvas);
