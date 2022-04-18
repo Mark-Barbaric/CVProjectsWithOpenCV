@@ -3,6 +3,8 @@
 #include <opencv2/highgui.hpp>
 #include <ObjectDetection/Preprocessing.h>
 
+constexpr auto imageFolder = "/Users/markbarbaric/Documents/Developer/CPP/OpenCV/CVProjectsWithOpenCV/Images/";
+
 constexpr char* keys ={
                 "{help h usage ? | | print this message}"
                 "{@image || Image to process}"
@@ -14,25 +16,29 @@ constexpr char* keys ={
 int main(int argc, char* argv[])
 {
     cv::CommandLineParser parser(argc, argv, keys);
+    cv::String imageFile;
 
     if(parser.has("help")){
         parser.printMessage();
         return 0;
     }
 
-    if(parser.get<cv::String>(0).empty()){
+    imageFile = parser.get<cv::String>(0).empty() ? cv::String(imageFolder) + "lena.jpg" :
+                parser.get<cv::String>(0);
+
+    const auto image = cv::imread(imageFile, cv::IMREAD_GRAYSCALE);
+
+    if(image.data == nullptr){
+        std::cout << "Failed to load image.\n";
         return -1;
     }
 
-    const auto imageFile = parser.get<cv::String>(0);
-    const auto image = cv::imread(imageFile, 0);
-    const auto imageNoise = ObjectDetection::Preprocessing::removeNoise(image);
+    cv::imshow("Image Before" , image);
 
+    const auto imageNoise = ObjectDetection::Preprocessing::removeNoise(imageFile);
     cv::imshow("Image Noise", imageNoise);
 
-    if(27 == cv::waitKey()){
-        return 0;
-    }
+    cv::waitKey();
 
     return 0;
 }

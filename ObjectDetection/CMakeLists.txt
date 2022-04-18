@@ -4,4 +4,7 @@ project(ObjectDetection)
 set(SOURCE Preprocessing.h Preprocessing.cpp)
 add_library(ObjectDetection SHARED ${SOURCE})
 
-set_target_properties(ObjectDetection PROPERTIES FOLDER "Libraries")
+include(${CMAKE_SOURCE_DIR}/Cmake/conanbuildinfo.cmake)
+
+target_link_libraries(ObjectDetection
+        ${CONAN_LIBS})

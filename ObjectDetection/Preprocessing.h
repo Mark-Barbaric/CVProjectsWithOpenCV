@@ -7,7 +7,7 @@ namespace ObjectDetection{
 
     public:
         Preprocessing();
-        static cv::Mat removeNoise(const cv::Mat& image);
+        static cv::Mat removeNoise(const cv::String& imageFile);
 
     };
 }

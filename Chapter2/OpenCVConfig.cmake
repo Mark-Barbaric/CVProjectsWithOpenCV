@@ -66,7 +66,7 @@ if(MSVC)
     set(OpenCV_ARCH x64)
     set(OpenCV_TBB_ARCH intel64)
   elseif((CMAKE_GENERATOR MATCHES "ARM") OR ("${arch_hint}" STREQUAL "ARM") OR (CMAKE_VS_EFFECTIVE_PLATFORMS MATCHES "ARM|arm"))
-    # see Modules/CmakeGenericSystem.cmake
+    # see Modules/CmakeGenericSystem.Cmake
     set(OpenCV_ARCH ARM)
   else()
     set(OpenCV_ARCH x86)
