@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED 20)
 set(SOURCES MultipleImageWindow.cpp MultipleImageWindow.h)
 add_library(OpenCVHelpers SHARED ${SOURCES})
 
-include(${CMAKE_SOURCE_DIR}/Cmake/conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 target_link_libraries(ObjectDetection
         ${CONAN_LIBS})

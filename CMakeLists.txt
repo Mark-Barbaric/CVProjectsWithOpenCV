@@ -29,13 +29,15 @@ endif()
 
 set(CONAN_DISABLE_CHECK_COMPILER True)
 
-set(conan_file "${CMAKE_SOURCE_DIR}/conanfile.txt")
+set(conan_file "${CMAKE_SOURCE_DIR}/conanfile.py")
 set(conan_install_optss "-g cmake --build=missing")
 if(UNIX)
 set(conan_profile_file "${CMAKE_SOURCE_DIR}/conan_profiles/ubuntu.profile")
 endif()
 
-message(STATUS "conan install ${conanfile} -pr ${conan_profile_file} ${Conan_install_optss}")
+#conan install conanfile.py -of Cmake -pr conan_profiles/ubuntu.profile -g cmake --build=missing
+
+message(STATUS "conan install ${conan_file} -pr ${conan_profile_file} ${conan_install_optss}")
 execute_process(
         COMMAND conan install "${conan_file}"
         -pr ${conan_profile_file}
@@ -48,9 +50,6 @@ execute_process(
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 conan_basic_setup()
-
-
-
 
 #list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
