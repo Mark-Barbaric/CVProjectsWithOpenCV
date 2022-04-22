@@ -27,17 +27,28 @@ int main(int argc, char* argv[])
     imageFile = parser.get<cv::String>(0).empty() ? cv::String(imageFolder) + "lena.jpg" :
                 parser.get<cv::String>(0);
 
-    const auto image = cv::imread(imageFile, cv::IMREAD_GRAYSCALE);
+    const auto image = cv::imread(imageFile, cv::IMREAD_COLOR);
+    cv::imshow("Image Before" , image);
 
     if(image.data == nullptr){
         std::cout << "Failed to load image.\n";
         return -1;
     }
 
-    cv::imshow("Image Before" , image);
+    cv::Mat imageGreyscale, imageNoise, imageWithoutLight;
 
-    const auto imageNoise = ObjectDetection::Preprocessing::removeNoise(imageFile);
+    try{
+        imageGreyscale = cv::imread(imageFile, cv::IMREAD_GRAYSCALE);
+        imageNoise = ObjectDetection::Preprocessing::removeNoise(image);
+        imageWithoutLight = ObjectDetection::Preprocessing::applyLightPattern(imageGreyscale, imageNoise, ObjectDetection::LightDifference::Division);
+
+    } catch(const std::exception& e){
+        std::cout << e.what() << ".\n";
+    }
+
     cv::imshow("Image Noise", imageNoise);
+    cv::imshow("Image Gray Scale", imageGreyscale);
+    cv::imshow("Image Without Light", imageWithoutLight);
 
     cv::waitKey();
 

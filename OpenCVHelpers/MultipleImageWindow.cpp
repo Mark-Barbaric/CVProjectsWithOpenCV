@@ -24,6 +24,7 @@ namespace OpenCVHelpers{
         cv::imshow(m_windowTitle, m_canvas);
     }
 
+
     int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool reRender)
     {
         m_windowTitles.push_back(std::move(windowTitle));
