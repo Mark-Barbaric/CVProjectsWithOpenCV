@@ -10,4 +10,5 @@ set(CMAKE_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR}/lib")
 target_link_libraries(Chapter5 PUBLIC
         ${CONAN_LIBS}
         ObjectDetection
+        OpenCVHelpers
         )

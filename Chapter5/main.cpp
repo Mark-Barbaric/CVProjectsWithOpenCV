@@ -2,6 +2,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <ObjectDetection/Preprocessing.h>
+#include <ObjectDetection/Segmentation.h>
+#include <OpenCVHelpers/MultipleImageWindow.h>
 
 //https://github.com/PacktPublishing/Building-Computer-Vision-Projects-with-OpenCV4-and-CPlusPlus/blob/master/Chapter05/main.cpp
 constexpr auto imageFolder = "/Users/markbarbaric/Documents/Developer/CPP/OpenCV/CVProjectsWithOpenCV/Images/";
@@ -28,29 +30,36 @@ int main(int argc, char* argv[])
                 parser.get<cv::String>(0);
 
     const auto image = cv::imread(imageFile, cv::IMREAD_COLOR);
-    cv::imshow("Image Before" , image);
 
     if(image.data == nullptr){
         std::cout << "Failed to load image.\n";
         return -1;
     }
 
-    cv::Mat imageGreyscale, imageNoise, imageWithoutLight;
+    cv::namedWindow("Test");
+    cv::imshow("Image Before" , image);
+
+    cv::Mat imageGreyscale, imageNoise, imageWithoutLight, imageThreshold;
+    const auto lightDetectionMethod = ObjectDetection::LightDifferenceMethod::Division;
 
     try{
         imageGreyscale = cv::imread(imageFile, cv::IMREAD_GRAYSCALE);
         imageNoise = ObjectDetection::Preprocessing::removeNoise(image);
-        imageWithoutLight = ObjectDetection::Preprocessing::applyLightPattern(imageGreyscale, imageNoise, ObjectDetection::LightDifference::Division);
-
+        imageWithoutLight = ObjectDetection::Preprocessing::applyLightPattern(imageGreyscale, imageNoise, lightDetectionMethod);
+        imageThreshold = ObjectDetection::Preprocessing::binarizeImage(imageWithoutLight, lightDetectionMethod);
     } catch(const std::exception& e){
         std::cout << e.what() << ".\n";
     }
+    cv::imshow("Image Greyscale" , imageGreyscale);
+    cv::imshow("Image Noise" , imageNoise);
+    cv::imshow("Image Without Light" , imageWithoutLight);
+    cv::imshow("Image Threshold" , imageThreshold);
 
-    cv::imshow("Image Noise", imageNoise);
-    cv::imshow("Image Gray Scale", imageGreyscale);
-    cv::imshow("Image Without Light", imageWithoutLight);
+    const auto connectedComponents = ObjectDetection::Segmentation::segmentImage(imageThreshold, ObjectDetection::SegmentationMethod::ConnectedComponents);
+    cv::imshow("Connected Components", connectedComponents);
 
-    cv::waitKey();
+
+    cv::waitKey(0);
 
     return 0;
 }

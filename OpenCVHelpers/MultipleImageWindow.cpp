@@ -2,31 +2,18 @@
 
 namespace OpenCVHelpers{
 
-    MultipleImageWindow* MultipleImageWindow::getInstance()
+    MultipleImageWindow::MultipleImageWindow(std::string windowTitle, int flag):m_windowTitle(std::move(windowTitle)),
+    m_flag(flag)
     {
-        if(m_instance == nullptr){
-            m_instance = new MultipleImageWindow();
-        }
-
-        return m_instance;
-    }
-
-    MultipleImageWindow::~MultipleImageWindow()
-    {
-        delete m_instance;
-        m_instance = nullptr;
-    }
-
-    MultipleImageWindow::MultipleImageWindow()
-    {
+        assert(!m_windowTitle.empty());
         cv::namedWindow(m_windowTitle, m_flag);
         m_canvas = cv::Mat(m_canvasHeight, m_canvasWidth, CV_8UC3);
         cv::imshow(m_windowTitle, m_canvas);
     }
 
-
     int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool reRender)
     {
+        assert(!windowTitle.empty() && !image.empty() && image.data);
         m_windowTitles.push_back(std::move(windowTitle));
         m_images.push_back(image);
 
@@ -61,11 +48,9 @@ namespace OpenCVHelpers{
             int cell_x= (cellWidth)*((i)%m_cols);
             int cell_y= (cellHeight)*floor((i)/(float)m_cols);
             cv::Rect mask(cell_x, cell_y, cellWidth, cellHeight);
-            // Draw a rectangle for each cell mat
             rectangle(m_canvas, cv::Rect(cell_x, cell_y, cellWidth, cellHeight), cv::Scalar(200,200,200), 1);
-            //For each cell draw an image if exists
+
             cv::Mat cell(m_canvas, mask);
-            // resize image to cell size
             cv::Mat resized;
             double cell_aspect= (double)cellWidth/(double)cellHeight;
             cv::Mat img= *it;

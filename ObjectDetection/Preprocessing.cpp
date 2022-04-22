@@ -1,10 +1,6 @@
 #include "Preprocessing.h"
-#include <opencv2/highgui.hpp>
 
 namespace ObjectDetection{
-    Preprocessing::Preprocessing(){
-
-    }
 
     cv::Mat Preprocessing::calculateLightPattern(const cv::Mat& image) {
         cv::Mat pattern;
@@ -21,10 +17,10 @@ namespace ObjectDetection{
         return imageNoise;
     }
 
-    cv::Mat Preprocessing::removeLight(const cv::Mat &image, const cv::Mat& lightPattern, LightDifference difference) {
+    cv::Mat Preprocessing::removeLight(const cv::Mat &image, const cv::Mat& lightPattern, LightDifferenceMethod difference) {
         cv::Mat aux;
         switch(difference){
-            case LightDifference::Division: {
+            case LightDifferenceMethod::Division: {
                 cv::Mat img32, pattern32;
                 cv::Mat imageCopy = image.clone(), lightPatternCopy = lightPattern.clone();
                 imageCopy.convertTo(img32, CV_32F);
@@ -33,7 +29,7 @@ namespace ObjectDetection{
                 aux.convertTo(aux, CV_8U, 255);
                 break;
             }
-            case LightDifference::Difference:{
+            case LightDifferenceMethod::Difference:{
                 aux = lightPattern - image;
                 break;
             }
@@ -46,13 +42,25 @@ namespace ObjectDetection{
         return aux;
     }
 
-    cv::Mat Preprocessing::applyLightPattern(const cv::Mat& image, const cv::Mat& imageNoise, LightDifference difference) {
+    cv::Mat Preprocessing::applyLightPattern(const cv::Mat& image, const cv::Mat& imageNoise, LightDifferenceMethod method) {
 
         cv::Mat lightPattern = calculateLightPattern(image);
         cv::medianBlur(lightPattern, lightPattern, 3);
         cv::Mat imageNoLight;
         imageNoise.copyTo(imageNoLight);
-        imageNoLight = removeLight(imageNoise, lightPattern, difference);
+        imageNoLight = removeLight(imageNoise, lightPattern, method);
         return imageNoLight;
+    }
+
+    cv::Mat Preprocessing::binarizeImage(const cv::Mat &imageNoLight, LightDifferenceMethod method) {
+        cv::Mat imageThreshold;
+
+        if(method == LightDifferenceMethod::None){
+            cv::threshold(imageNoLight, imageThreshold, 150, 255, cv::THRESH_BINARY_INV);
+        } else {
+            cv::threshold(imageNoLight, imageThreshold, 30, 255, cv::THRESH_BINARY);
+        }
+
+        return imageThreshold;
     }
 }
