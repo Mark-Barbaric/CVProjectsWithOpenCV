@@ -55,9 +55,12 @@ int main(int argc, char* argv[])
     cv::imshow("Image Without Light" , imageWithoutLight);
     cv::imshow("Image Threshold" , imageThreshold);
 
-    const auto connectedComponents = ObjectDetection::Segmentation::segmentImage(imageThreshold, ObjectDetection::SegmentationMethod::ConnectedComponents);
-    cv::imshow("Connected Components", connectedComponents);
 
+    for(auto i = 0; i < 2; ++i){
+        const auto connectedComponents = ObjectDetection::Segmentation::segmentImage(imageThreshold,
+                                                                                     static_cast<ObjectDetection::SegmentationMethod>(i));
+        cv::imshow("Segmentation #" + std::to_string(i), connectedComponents);
+    }
 
     cv::waitKey(0);
 

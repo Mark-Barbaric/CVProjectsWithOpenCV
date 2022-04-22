@@ -1,4 +1,6 @@
 #include "Segmentation.h"
+#include <OpenCVHelpers/GeneralHelpers.h>
+#include <iostream>
 
 namespace ObjectDetection{
 
@@ -13,16 +15,44 @@ namespace ObjectDetection{
         }
 
         output = cv::Mat::zeros(image.rows, image.cols, CV_8UC3);
-        cv::RNG rng(0XFFFFFFFF);
+        cv::RNG rng (0xFFFFFFFF);
 
         for(auto i = 0; i < numObjects; ++i){
             cv::Mat mask = labels == i;
-            output.setTo(cv::Scalar(static_cast<unsigned>(rng)&255,
-                                    static_cast<unsigned>(rng) >> 8 &255,
-                         static_cast<unsigned>(rng) >> 16 & 255),
+            output.setTo(OpenCVHelpers::GeneralHelpers::generateRandomColor(rng),
                          mask);
         }
 
+        return output;
+    }
+
+    cv::Mat Segmentation::connectComponentsWithStats(const cv::Mat &image) {
+        cv::Mat labels, stats, centroids;
+        const auto numObjects = cv::connectedComponentsWithStats(image, labels, stats, centroids) - 1;
+
+        if(numObjects == 0){
+            return {};
+        }
+
+        cv::Mat output = cv::Mat::zeros(image.rows, image.cols, CV_8UC3);
+        cv::RNG rng (0xFFFFFFFF);
+
+        for(auto i = 0; i < numObjects; ++i){
+            std::cout << "Object " << i << " with pos: " << centroids.at<cv::Point2d>(i) << " with area "
+            << stats.at<int>(i, cv::CC_STAT_AREA) << std::endl;
+
+            cv::Mat mask = labels == i;
+            output.setTo(OpenCVHelpers::GeneralHelpers::generateRandomColor(rng), mask);
+            std::stringstream ss;
+            ss << "area: " << stats.at<int>(i, cv::CC_STAT_AREA);
+
+            cv::putText(output,
+                        ss.str(),
+                        centroids.at<cv::Point2d>(i),
+                    cv::FONT_HERSHEY_SIMPLEX,
+                    0.4,
+                    cv::Scalar(255,255,255));
+        }
         return output;
     }
 
@@ -31,6 +61,10 @@ namespace ObjectDetection{
         switch(method){
             case SegmentationMethod::ConnectedComponents: {
                 return connectedComponents(image);
+            }
+
+            case SegmentationMethod::ConnectedComponentsWithStats:{
+                return connectComponentsWithStats(image);
             }
 
             default: {

@@ -2,7 +2,7 @@
 
 namespace ObjectDetection{
 
-    enum class SegmentationMethod : char {
+    enum class SegmentationMethod : int {
         ConnectedComponents = 0, ConnectedComponentsWithStats, FindContoursBasic
     };
 
