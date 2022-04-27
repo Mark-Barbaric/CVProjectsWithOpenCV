@@ -1,4 +1,5 @@
 #include "Preprocessing.h"
+#include <opencv2/imgcodecs.hpp>
 
 namespace ObjectDetection{
 
@@ -62,5 +63,13 @@ namespace ObjectDetection{
         }
 
         return imageThreshold;
+    }
+
+    cv::Mat Preprocessing::Preprocess(const cv::String &image) {
+        assert(!image.empty());
+        const auto imageGreyscale = cv::imread(image, cv::IMREAD_GRAYSCALE);
+        const auto imageNoise = removeNoise(imageGreyscale);
+        const auto imageWithoutLight = applyLightPattern(imageGreyscale, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
+        return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
     }
 }

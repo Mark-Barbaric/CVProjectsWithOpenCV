@@ -15,6 +15,7 @@ namespace ObjectDetection{
         static cv::Mat removeNoise(const cv::Mat& image);
         static cv::Mat applyLightPattern(const cv::Mat& image, const cv::Mat& imageNoise, LightDifferenceMethod difference);
         static cv::Mat binarizeImage(const cv::Mat& image, LightDifferenceMethod difference);
+        static cv::Mat Preprocess(const cv::String& image);
 
 
     };
