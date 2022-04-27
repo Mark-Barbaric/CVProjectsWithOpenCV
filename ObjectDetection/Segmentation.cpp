@@ -56,6 +56,25 @@ namespace ObjectDetection{
         return output;
     }
 
+    cv::Mat Segmentation::contourBasic(const cv::Mat &image) {
+        std::vector<std::vector<cv::Point>> contours;
+        cv::findContours(image, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+        cv::Mat output = cv::Mat::zeros(image.rows, image.cols, CV_8UC3);
+
+        if(contours.empty()){
+            return {};
+        }
+
+        cv::RNG rng(0xFFFFFFFF);
+
+        for(auto i = 0; i < contours.size(); ++i){
+            cv::drawContours(output, contours, i,
+                             OpenCVHelpers::GeneralHelpers::generateRandomColor(rng));
+        }
+
+        return output;
+    }
+
     cv::Mat Segmentation::segmentImage(const cv::Mat &image, SegmentationMethod method) {
 
         switch(method){
@@ -65,6 +84,10 @@ namespace ObjectDetection{
 
             case SegmentationMethod::ConnectedComponentsWithStats:{
                 return connectComponentsWithStats(image);
+            }
+
+            case SegmentationMethod::FindContoursBasic:{
+                return contourBasic(image);
             }
 
             default: {

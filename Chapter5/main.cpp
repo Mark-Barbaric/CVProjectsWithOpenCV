@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    imageFile = parser.get<cv::String>(0).empty() ? cv::String(imageFolder) + "lena.jpg" :
+    imageFile = parser.get<cv::String>(0).empty() ? cv::String(imageFolder) + "pins.jpg" :
                 parser.get<cv::String>(0);
 
     const auto image = cv::imread(imageFile, cv::IMREAD_COLOR);
@@ -55,14 +55,12 @@ int main(int argc, char* argv[])
     cv::imshow("Image Without Light" , imageWithoutLight);
     cv::imshow("Image Threshold" , imageThreshold);
 
-
-    for(auto i = 0; i < 2; ++i){
+    for (auto i = 0; i < 3; ++i) {
         const auto connectedComponents = ObjectDetection::Segmentation::segmentImage(imageThreshold,
                                                                                      static_cast<ObjectDetection::SegmentationMethod>(i));
         cv::imshow("Segmentation #" + std::to_string(i), connectedComponents);
     }
 
     cv::waitKey(0);
-
     return 0;
 }

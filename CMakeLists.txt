@@ -31,8 +31,13 @@ set(CONAN_DISABLE_CHECK_COMPILER True)
 
 set(conan_file "${CMAKE_SOURCE_DIR}/conanfile.py")
 set(conan_install_optss "-g cmake --build=missing")
+
 if(UNIX)
 set(conan_profile_file "${CMAKE_SOURCE_DIR}/conan_profiles/ubuntu.profile")
+endif()
+
+if(APPLE)
+    set(conan_profile_file "${CMAKE_SOURCE_DIR}/conan_profiles/mac.profile")
 endif()
 
 #conan install conanfile.py -of Cmake -pr conan_profiles/ubuntu.profile -g cmake --build=missing
