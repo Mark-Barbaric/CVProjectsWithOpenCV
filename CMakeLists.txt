@@ -54,6 +54,7 @@ conan_basic_setup()
 
 #list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-add_subdirectory(Chapter5)
 add_subdirectory(ObjectDetection)
 add_subdirectory(OpenCVHelpers)
+add_subdirectory(Chapter5)
+add_subdirectory(Chapter6)
