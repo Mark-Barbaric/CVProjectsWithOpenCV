@@ -7,6 +7,7 @@ namespace OpenCVHelpers{
     {
         assert(!m_windowTitle.empty());
         cv::namedWindow(m_windowTitle, m_flag);
+        cv::moveWindow(m_windowTitle, 0, 0);
         m_canvas = cv::Mat(m_canvasHeight, m_canvasWidth, CV_8UC3);
         cv::imshow(m_windowTitle, m_canvas);
     }
@@ -14,14 +15,24 @@ namespace OpenCVHelpers{
     int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool reRender)
     {
         assert(!windowTitle.empty() && !image.empty() && image.data);
-        m_windowTitles.push_back(std::move(windowTitle));
-        m_images.push_back(image);
 
-        if(reRender){
-            render();
+        int index=-1;
+        for(int i = 0; i<this->m_windowTitles.size(); i++){
+            const auto t = this->m_windowTitles[i];
+            if(t == windowTitle){
+                index=i;
+                break;
+            }
         }
-
-        return static_cast<int>(m_images.size() - 1);
+        if(index==-1){
+            this->m_windowTitles.push_back(windowTitle);
+            this->m_images.push_back(image);
+        }else{
+            this->m_images[index]= image;
+        }
+        if(reRender)
+            this->render();
+        return this->m_images.size()-1;
     }
 
     void MultipleImageWindow::removeImage(int pos)
@@ -73,6 +84,6 @@ namespace OpenCVHelpers{
             }
         }
 
-        imshow(m_windowTitle, m_canvas);
+        cv::imshow(m_windowTitle, m_canvas);
     }
 }

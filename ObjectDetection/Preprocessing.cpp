@@ -72,4 +72,17 @@ namespace ObjectDetection{
         const auto imageWithoutLight = applyLightPattern(imageGreyscale, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
         return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
     }
+
+    cv::Mat Preprocessing::Preprocess(const cv::Mat &input) {
+
+        auto newInput = input.clone();
+
+        if(newInput.channels() == 3){
+            cv::cvtColor(newInput, newInput, cv::COLOR_RGB2GRAY);
+        }
+
+        const auto imageNoise = removeNoise(newInput);
+        const auto imageWithoutLight = applyLightPattern(newInput, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
+        return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
+    }
 }
