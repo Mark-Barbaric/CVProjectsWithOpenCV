@@ -1,5 +1,5 @@
 #include "Segmentation.h"
-#include <OpenCVHelpers/GeneralHelpers.h>
+#include <Lib/OpenCVHelpers/GeneralHelpers.h>
 #include <iostream>
 
 namespace ObjectDetection{
