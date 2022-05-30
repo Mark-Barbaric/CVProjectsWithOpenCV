@@ -2,9 +2,7 @@
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "Lib/platformAPIDefs.h"
-
-#ifdef
+#include "platformAPIDefs.h"
 
 namespace OpenCVHelpers{
 
@@ -26,7 +24,7 @@ namespace OpenCVHelpers{
 
         MultipleImageWindow(std::string windowTitle, int flag);
 
-        int addImage(std::string windowTitle, const cv::Mat& image, bool render=false);
+        int addImage(const std::string& windowTitle, const cv::Mat& image, bool render=false);
         void removeImage(int pos);
         void render();
 

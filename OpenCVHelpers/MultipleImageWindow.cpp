@@ -12,7 +12,7 @@ namespace OpenCVHelpers{
         cv::imshow(m_windowTitle, m_canvas);
     }
 
-    int MultipleImageWindow::addImage(std::string windowTitle, const cv::Mat& image, bool reRender)
+    int MultipleImageWindow::addImage(const std::string& windowTitle, const cv::Mat& image, bool reRender)
     {
         assert(!windowTitle.empty() && !image.empty() && image.data);
 

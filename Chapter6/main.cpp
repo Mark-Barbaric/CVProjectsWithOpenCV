@@ -5,11 +5,11 @@
 #include <OpenCVHelpers/MultipleImageWindow.h>
 #include <iostream>
 #include <opencv2/ml.hpp>
+#include <opencv2/imgproc.hpp>
 
 std::shared_ptr<OpenCVHelpers::MultipleImageWindow> miw;
 cv::Ptr<cv::ml::SVM> svm;
 cv::Scalar green(0, 255, 0), blue (255, 0, 0), red(0, 0, 255);
-cv::Mat lightPattern;
 
 const char* keys = {
 "{help h usage ? | | print this message}"
@@ -149,13 +149,14 @@ void plotTrainData(cv::Mat trainData, cv::Mat labels, float *error=NULL)
 
     if(error!=NULL){
         std::stringstream ss;
-        ss << "Error: " << *error << "\%";
+        ss << "Error: " << *error << '\%';
         putText(plot, ss.str().c_str(), cv::Point(20,512-40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(200,200,200), 1, cv::LINE_AA);
     }
     miw->addImage("Plot", plot);
 }
 
 void trainAndTest(){
+
     std::vector<float> trainingData;
     std::vector<int> responsesData;
     std::vector<float> testData;
@@ -221,38 +222,28 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    cv::String imageFile = cli.get<cv::String>(0);
-    cv::String lightPatternFile = "../data/pattern.pgm";
-
     if(!cli.check()){
         cli.printErrors();
         return 1;
     }
 
+    cv::String inputImageFilePath = cli.get<cv::String>(0);
+
     miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
 
-    cv::Mat image = cv::imread(imageFile, 0);
+    cv::Mat inputImage = cv::imread(inputImageFilePath, 0);
 
-    if(image.data == nullptr){
-        std::cout << "Failed to load image.\n";
+    if(inputImage.data == nullptr){
+        std::cout << "Failed to load image: " << inputImageFilePath << "\n.";
         return 1;
     }
 
-    cv::Mat imageOutput = image.clone();
-    cv::cvtColor(imageOutput, imageOutput, cv::COLOR_RGB2GRAY);
-
-    lightPattern = cv::imread(lightPatternFile, 0);
-
-    if(lightPattern.data == nullptr){
-        std::cout << "Failed to load light pattern file.\n";
-        return 1;
-    }
-
-    cv::medianBlur(lightPattern, lightPattern, 3);
+    cv::Mat inputImageClone = inputImage.clone();
+    cv::cvtColor(inputImageClone, inputImageClone, cv::COLOR_RGB2GRAY);
 
     trainAndTest();
 
-    cv::Mat pre = ObjectDetection::Preprocessing::Preprocess(image);
+    cv::Mat pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
 
     std::vector<int> posLeft, posTop;
     std::vector<std::vector<float>> features = ExtractFeatures(pre, &posLeft, &posTop);
@@ -280,7 +271,7 @@ int main(int argc, char* argv[]){
             ss << "SCREW";
         }
 
-        cv::putText(imageOutput, ss.str(),
+        cv::putText(inputImageClone, ss.str(),
                     cv::Point2d(posLeft[i], posTop[i]),
                     cv::FONT_HERSHEY_SIMPLEX,
                     0.4,
@@ -289,7 +280,7 @@ int main(int argc, char* argv[]){
     }
 
     miw->addImage("Binary Image", pre);
-    miw->addImage("Result", imageOutput);
+    miw->addImage("Result", inputImageClone);
     miw->render();
     cv::waitKey(10);
 
