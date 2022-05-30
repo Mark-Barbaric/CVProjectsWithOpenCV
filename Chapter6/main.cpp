@@ -3,12 +3,10 @@
 #include <ObjectDetection/Preprocessing.h>
 #include <ObjectDetection/Segmentation.h>
 #include <OpenCVHelpers/MultipleImageWindow.h>
+#include <OpenCVHelpers/GeneralHelpers.h>
 #include <iostream>
 #include <opencv2/ml.hpp>
 #include <opencv2/imgproc.hpp>
-
-cv::Ptr<cv::ml::SVM> svm;
-cv::Scalar green(0, 255, 0), blue (255, 0, 0), red(0, 0, 255);
 
 const char* keys = {
 "{help h usage ? | | print this message}"
@@ -29,8 +27,6 @@ std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelper
     }
 
     cv::RNG rng(0XFFFFFFFF);
-
-    std::weak_ptr<OpenCVHelpers::MultipleImageWindow> multipleIMageWindow;
 
     for(int i = 0; i < contours.size(); ++i){
         cv::Mat mask = cv::Mat::zeros(input.rows, input.cols, CV_8UC1);
@@ -64,13 +60,12 @@ std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelper
                 cv::waitKey(10);
             }
         }
-
     }
     return output;
 }
 
 bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow,
-                                  std::string folder, int label, int num_for_test,
+                                  const std::string& folder, int label, int numForTest,
                                   std::vector<float>& trainingData, std::vector<int>& responsesData,
                                   std::vector<float>& testData, std::vector<float>& testResponsesData){
     cv::VideoCapture images;
@@ -81,16 +76,14 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
     }
 
     cv::Mat frame;
-
     int img_index = 0;
 
     while(images.read(frame)){
         const auto preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
-
         const auto features = ExtractFeatures(sharedWindow, preprocessedImage);
 
         for(int i = 0; i < features.size(); ++i){
-            if(img_index >= num_for_test){
+            if(img_index >= numForTest){
                 trainingData.push_back(features[i][0]);
                 trainingData.push_back(features[i][1]);
                 responsesData.push_back(label);
@@ -100,7 +93,6 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
                 responsesData.push_back(static_cast<float>(label));
             }
         }
-
         img_index++;
     }
 
@@ -144,13 +136,13 @@ void plotTrainData(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& shar
         cv::Scalar color;
 
         if(label==0) {
-            color = green;
+            color = OpenCVHelpers::GeneralHelpers::green;
         }// NUT
         else if(label==1) {
-            color = blue; // RING
+            color = OpenCVHelpers::GeneralHelpers::blue; // RING
         }
         else if(label==2) {
-            color = red; // SCREW
+            color = OpenCVHelpers::GeneralHelpers::red; // SCREW
             circle(plot, cv::Point(x, y), 3, color, -1, 8);
         }
     }
@@ -158,7 +150,7 @@ void plotTrainData(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& shar
     if(error){
         std::stringstream ss;
         ss << "Error: " << *error << '\%';
-        putText(plot, ss.str().c_str(), cv::Point(20,512-40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(200,200,200), 1, cv::LINE_AA);
+        putText(plot, ss.str(), cv::Point(20,512-40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(200,200,200), 1, cv::LINE_AA);
     }
 
     if(const auto tempWindow = sharedWindow.lock()){
@@ -192,6 +184,10 @@ void trainAndTest(cv::Ptr<cv::ml::SVM>& svm,
 
     cv::Mat testDataMat(testData.size()/2, 2, CV_32FC1, &testData[0]);
     cv::Mat testResponses(testResponsesData.size(), 1, CV_32FC1, &testResponsesData[0]);
+
+    if(!svm.get()){
+        throw std::logic_error("SVM Model is not valid.");
+    }
 
     cv::Ptr<cv::ml::TrainData> tdata= cv::ml::TrainData::create(trainingDataMat, cv::ml::ROW_SAMPLE, responses);
     svm->setType(cv::ml::SVM::C_SVC);
@@ -237,7 +233,7 @@ int main(int argc, char* argv[]){
     }
 
     const auto inputImageFilePath = cli.get<cv::String>(0);
-    cv::Mat inputImage = cv::imread(inputImageFilePath, 0);
+    cv::Mat inputImage = cv::imread(inputImageFilePath, cv::IMREAD_COLOR);
 
     if(inputImage.data == nullptr){
         std::cout << "Failed to load image: " << inputImageFilePath << "\n.";
@@ -245,20 +241,40 @@ int main(int argc, char* argv[]){
     }
 
     cv::Mat inputImageClone = inputImage.clone();
-    cv::cvtColor(inputImageClone, inputImageClone, cv::COLOR_RGB2GRAY);
+
+    try{
+        cv::cvtColor(inputImageClone, inputImageClone, cv::COLOR_RGB2GRAY);
+    } catch(const std::exception& e){
+        std::cout << "Failed to recolor image with error: " << e.what() << "\n.";
+        return 1;
+    }
 
     const auto miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
 
-    cv::Ptr<cv::ml::SVM> svm;
-    trainAndTest(svm, miw);
+    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
 
-    cv::Mat pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
+    try{
+        trainAndTest(svm, miw);
+    } catch(const std::exception& e){
+        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
+        return 1;
+    }
+
+    cv::Mat pre;
+
+    try{
+        pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
+    } catch(const std::exception& e){
+        std::cout << "Failed to preprocess image with error: " << e.what() << "\n.";
+        return 1;
+    }
 
     std::vector<int> posLeft, posTop;
     std::vector<std::vector<float>> features = ExtractFeatures(miw, pre, &posLeft, &posTop);
 
     if(!features.empty()){
         std::cout << "Failed to extract features from source image \n.";
+        return 1;
     }
 
     for(int i = 0; i < features.size(); ++i){
@@ -270,13 +286,13 @@ int main(int argc, char* argv[]){
         cv::Scalar color;
 
         if(result == 0){
-            color = green;
+            color = OpenCVHelpers::GeneralHelpers::green;
             ss << "NUT";
         } else if (result == 1){
-            color = blue;
+            color = OpenCVHelpers::GeneralHelpers::blue;
             ss << "RING";
         } else if (result == 2){
-            color = red;
+            color = OpenCVHelpers::GeneralHelpers::red;
             ss << "SCREW";
         }
 
