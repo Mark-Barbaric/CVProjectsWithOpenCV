@@ -13,6 +13,13 @@ const char* keys = {
 "{@image || Image to classify}"
 };
 
+#ifdef WIN32
+#endif
+
+#ifdef linux
+constexpr auto TrainingDataPrefix = "/home/markbarbaric/Documents/Mirriad/Developer/cpp/CVProjectsWithOpenCV/";
+#endif
+
 std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image, std::vector<int>* left = nullptr, std::vector<int>* top = nullptr){
     std::vector<std::vector<float>> output;
     std::vector<std::vector<cv::Point>> contours;
@@ -79,8 +86,24 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
     int img_index = 0;
 
     while(images.read(frame)){
-        const auto preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
-        const auto features = ExtractFeatures(sharedWindow, preprocessedImage);
+
+        cv::Mat preprocessedImage;
+
+        try {
+            preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
+        } catch(const std::exception& e){
+            std::cout << "Failed to preprocess image#" << img_index << " with error: " << e.what() << "\n.";
+            return false;
+        }
+
+        std::vector<std::vector<float>> features;
+
+        try {
+            features = ExtractFeatures(sharedWindow, preprocessedImage);
+        } catch (const std::exception& e){
+            std::cout << "Failed to extract features for image#" << img_index << " with error: " << e.what() << "\n.";
+            return false;
+        }
 
         for(int i = 0; i < features.size(); ++i){
             if(img_index >= numForTest){
@@ -168,12 +191,22 @@ void trainAndTest(cv::Ptr<cv::ml::SVM>& svm,
 
     int num_for_test = 20;
 
+    std::string prefix = TrainingDataPrefix;
     // Get the nut images
-    readFolderAndExtractFeatures(window, "../TrainingData/nut/tuerca_%04d.pgm", 0, num_for_test, trainingData, responsesData, testData, testResponsesData);
+    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/nut/tuerca_%04d.pgm", 0, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+        std::cout << "Failed to extract features for nut images.\n";
+        return;
+    }
     // Get and process the ring images
-    readFolderAndExtractFeatures(window, "../TrainingData/ring/arandela_%04d.pgm", 1, num_for_test, trainingData, responsesData, testData, testResponsesData);
+    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/ring/arandela_%04d.pgm", 1, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+        std::cout << "Failed to extract features for ring images.\n";
+        return;
+    }
     // get and process the screw images
-    readFolderAndExtractFeatures(window, "../TrainingData/screw/tornillo_%04d.pgm", 2, num_for_test, trainingData, responsesData, testData, testResponsesData);
+    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/screw/tornillo_%04d.pgm", 2, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+        std::cout << "Failed to extract features for screw images.\n";
+        return;
+    }
 
     std::cout << "Num of train samples: " << responsesData.size() << ".\n";
     std::cout << "Num of test samples: " << testResponsesData.size() << ".\n";
