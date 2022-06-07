@@ -65,24 +65,17 @@ namespace ObjectDetection{
         return imageThreshold;
     }
 
-    cv::Mat Preprocessing::Preprocess(const cv::String &image) {
-        assert(!image.empty());
-        const auto imageGreyscale = cv::imread(image, cv::IMREAD_GRAYSCALE);
-        const auto imageNoise = removeNoise(imageGreyscale);
-        const auto imageWithoutLight = applyLightPattern(imageGreyscale, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
-        return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
-    }
-
     cv::Mat Preprocessing::Preprocess(const cv::Mat &input) {
 
-        auto newInput = input.clone();
-
-        if(newInput.channels() == 3){
-            cv::cvtColor(newInput, newInput, cv::COLOR_RGB2GRAY);
+        if(input.channels() == 1){
+            throw std::logic_error("Can't preprocess grayscale image.");
         }
 
-        const auto imageNoise = removeNoise(newInput);
-        const auto imageWithoutLight = applyLightPattern(newInput, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
+        cv::Mat inputCopy, inputCopyGrayscale;
+        inputCopy = input.clone();
+        cv::cvtColor(inputCopy, inputCopyGrayscale, cv::COLOR_BGR2GRAY);
+        const auto imageNoise = removeNoise(inputCopy);
+        const auto imageWithoutLight = applyLightPattern(inputCopyGrayscale, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
         return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
     }
 }

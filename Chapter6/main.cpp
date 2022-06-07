@@ -90,6 +90,8 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
 
         cv::Mat preprocessedImage;
 
+        const auto numChannels = frame.channels();
+
         try {
             preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
         } catch(const std::exception& e){
@@ -114,7 +116,7 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
             } else {
                 testData.push_back(features[i][0]);
                 testData.push_back(features[i][1]);
-                responsesData.push_back(static_cast<float>(label));
+                testResponsesData.push_back(static_cast<float>(label));
             }
         }
         img_index++;
@@ -266,6 +268,17 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
+    const auto miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
+
+    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+    std::cout << "Training and testing SVM Model.\n";
+    try{
+        trainAndTest(svm, miw);
+    } catch(const std::exception& e){
+        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
+        return 1;
+    }
+
     const auto inputImageFilePath = cli.get<cv::String>(0);
     cv::Mat inputImage = cv::imread(inputImageFilePath, cv::IMREAD_COLOR);
 
@@ -276,26 +289,16 @@ int main(int argc, char* argv[]){
 
     cv::Mat inputImageClone = inputImage.clone();
 
+    /*
     try{
         cv::cvtColor(inputImageClone, inputImageClone, cv::COLOR_RGB2GRAY);
     } catch(const std::exception& e){
         std::cout << "Failed to recolor image with error: " << e.what() << "\n.";
         return 1;
     }
-
-    const auto miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
-
-    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-
-    try{
-        trainAndTest(svm, miw);
-    } catch(const std::exception& e){
-        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
-        return 1;
-    }
-
+     */
     cv::Mat pre;
-
+    std::cout << "Preprocessing input image.\n";
     try{
         pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
     } catch(const std::exception& e){
@@ -306,7 +309,7 @@ int main(int argc, char* argv[]){
     std::vector<int> posLeft, posTop;
     std::vector<std::vector<float>> features = ExtractFeatures(miw, pre, &posLeft, &posTop);
 
-    if(!features.empty()){
+    if(features.empty()){
         std::cout << "Failed to extract features from source image \n.";
         return 1;
     }
@@ -330,6 +333,8 @@ int main(int argc, char* argv[]){
             ss << "SCREW";
         }
 
+        std::cout << "Image classified as :" << ss.str() << ".\n";
+
         cv::putText(inputImageClone, ss.str(),
                     cv::Point2d(posLeft[i], posTop[i]),
                     cv::FONT_HERSHEY_SIMPLEX,
@@ -341,7 +346,7 @@ int main(int argc, char* argv[]){
     miw->addImage("Binary Image", pre);
     miw->addImage("Result", inputImageClone);
     miw->render();
-    cv::waitKey(10);
+    cv::waitKey(5000);
 
     return 0;
 }
