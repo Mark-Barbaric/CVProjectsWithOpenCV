@@ -14,6 +14,7 @@ const char* keys = {
 };
 
 #ifdef WIN32
+constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\TrainingData\)";
 #endif
 
 #ifdef linux
@@ -172,7 +173,7 @@ void plotTrainData(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& shar
 
     if(error){
         std::stringstream ss;
-        ss << "Error: " << *error << '\%';
+        ss << "Error: " << *error << "%\n";
         putText(plot, ss.str(), cv::Point(20,512-40), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(200,200,200), 1, cv::LINE_AA);
     }
 

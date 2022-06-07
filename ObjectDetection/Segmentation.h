@@ -1,3 +1,13 @@
+#pragma once
+
+#include "../platformAPIDefs.h"
+
+#ifndef OBJECT_DETECTION_EXPORT
+#define OBJECT_DETECTION_API PLATFORM_DLL_EXPORT
+#else
+#define OBJECT_DETECTION_API PLATFORM_DLL_IMPORT
+#endif
+
 #include <opencv2/imgproc.hpp>
 
 namespace ObjectDetection{
@@ -6,7 +16,7 @@ namespace ObjectDetection{
         ConnectedComponents = 0, ConnectedComponentsWithStats, FindContoursBasic
     };
 
-    class Segmentation{
+    class OBJECT_DETECTION_API Segmentation{
 
         static cv::Mat connectedComponents(const cv::Mat& image);
         static cv::Mat connectComponentsWithStats(const cv::Mat& image);

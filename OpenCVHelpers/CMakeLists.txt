@@ -6,7 +6,12 @@ set(SOURCES MultipleImageWindow.cpp MultipleImageWindow.h GeneralHelpers.h)
 add_library(OpenCVHelpers SHARED ${SOURCES})
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+conan_basic_setup(TARGETS)
 
 target_link_libraries(OpenCVHelpers
-        ${CONAN_LIBS})
+        CONAN_PKG::opencv)
+
+set_target_properties(OpenCVHelpers PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/lib"
+        )

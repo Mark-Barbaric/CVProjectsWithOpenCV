@@ -14,6 +14,7 @@ class OpenCVConanFile(ConanFile):
         self.requires('opencv/4.5.2')
 
         if self.settings.os == "Windows":
-            self.requires('OpenSSL/1.1.1b@conan/stable')
+            ...
+        #    self.requires('OpenSSL/1.1.1n@conan/stable')
         else:
             self.requires('openssl/1.1.1c')

@@ -8,7 +8,7 @@
 //https://github.com/PacktPublishing/Building-Computer-Vision-Projects-with-OpenCV4-and-CPlusPlus/blob/master/Chapter05/main.cpp
 constexpr auto imageFolder = "/Users/markbarbaric/Documents/Developer/CPP/OpenCV/CVProjectsWithOpenCV/Images/";
 
-constexpr char* keys ={
+const char* keys ={
                 "{help h usage ? | | print this message}"
                 "{@image || Image to process}"
                 "{@lightPattern || Image light pattern to apply to image input}"

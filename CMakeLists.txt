@@ -53,6 +53,8 @@ include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 conan_basic_setup()
 
 #list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 
 add_subdirectory(ObjectDetection)
 add_subdirectory(OpenCVHelpers)

@@ -1,12 +1,20 @@
 #pragma once
 
+#include "platformAPIDefs.h"
+
+#ifndef OPEN_CV_HELPERS_EXPORT
+#define OPEN_CV_HELPERS_API PLATFORM_DLL_EXPORT
+#else
+#define OPEN_CV_HELPERS_API PLATFORM_DLL_IMPORT
+#endif
+
+
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "platformAPIDefs.h"
 
 namespace OpenCVHelpers{
 
-    class MultipleImageWindow{
+    class OPEN_CV_HELPERS_API MultipleImageWindow{
 
         const std::string m_windowName {"Main window"};
         const std::string m_windowTitle;
