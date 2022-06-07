@@ -289,14 +289,6 @@ int main(int argc, char* argv[]){
 
     cv::Mat inputImageClone = inputImage.clone();
 
-    /*
-    try{
-        cv::cvtColor(inputImageClone, inputImageClone, cv::COLOR_RGB2GRAY);
-    } catch(const std::exception& e){
-        std::cout << "Failed to recolor image with error: " << e.what() << "\n.";
-        return 1;
-    }
-     */
     cv::Mat pre;
     std::cout << "Preprocessing input image.\n";
     try{
