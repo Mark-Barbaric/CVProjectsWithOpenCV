@@ -1,6 +1,7 @@
 #include <ObjectDetection/Preprocessing.h>
 #include <OpenCVHelpers/MultipleImageWindow.h>
 #include <iostream>
+#include "ExtractFeatures.h"
 
 const char* cliKeys = {
         "{help h usage ? | | print this message}"
@@ -59,6 +60,10 @@ int main(int argc, char** argv){
             << " to Multiple Image Window with error: " << e.what() << "\n";
             return 1;
         }
+
+        std::cout << "Attempting to ExtractFeatures.\n";
+
+        const auto imageFeatures =
 
     });
 
