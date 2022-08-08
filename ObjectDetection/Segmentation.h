@@ -9,6 +9,7 @@
 #endif
 
 #include <opencv2/imgproc.hpp>
+#include <variant>
 
 namespace ObjectDetection{
 

@@ -6,7 +6,6 @@
 #include <OpenCVHelpers/GeneralHelpers.h>
 #include <iostream>
 #include <opencv2/ml.hpp>
-#include <opencv2/imgproc.hpp>
 
 const char* keys = {
 "{help h usage ? | | print this message}"
@@ -21,6 +20,7 @@ constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Develope
 constexpr auto TrainingDataPrefix = "/home/markbarbaric/Documents/Mirriad/Developer/cpp/CVProjectsWithOpenCV/";
 #endif
 
+// extracts the area and aspect ratio
 std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image, std::vector<int>* left = nullptr, std::vector<int>* top = nullptr){
     std::vector<std::vector<float>> output;
     std::vector<std::vector<cv::Point>> contours;
@@ -46,11 +46,11 @@ std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelper
             cv::RotatedRect r = cv::minAreaRect(contours[i]);
             const float width = r.size.width;
             const float height = r.size.height;
-            const auto ar = (width < height) ? height / width : width / height;
+            const auto aspectRatio = (width < height) ? height / width : width / height;
 
             std::vector<float> row;
             row.push_back(area);
-            row.push_back(ar);
+            row.push_back(aspectRatio);
 
             output.push_back(row);
 
@@ -196,17 +196,17 @@ void trainAndTest(cv::Ptr<cv::ml::SVM>& svm,
 
     std::string prefix = TrainingDataPrefix;
     // Get the nut images
-    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/nut/tuerca_%04d.pgm", 0, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+    if(!readFolderAndExtractFeatures(window, prefix + "\\nut\\tuerca_%04d.pgm", 0, num_for_test, trainingData, responsesData, testData, testResponsesData)){
         std::cout << "Failed to extract features for nut images.\n";
         return;
     }
     // Get and process the ring images
-    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/ring/arandela_%04d.pgm", 1, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+    if(!readFolderAndExtractFeatures(window, prefix + "\\ring\\arandela_%04d.pgm", 1, num_for_test, trainingData, responsesData, testData, testResponsesData)){
         std::cout << "Failed to extract features for ring images.\n";
         return;
     }
     // get and process the screw images
-    if(!readFolderAndExtractFeatures(window, prefix + "TrainingData/screw/tornillo_%04d.pgm", 2, num_for_test, trainingData, responsesData, testData, testResponsesData)){
+    if(!readFolderAndExtractFeatures(window, prefix + "\\screw\\tornillo_%04d.pgm", 2, num_for_test, trainingData, responsesData, testData, testResponsesData)){
         std::cout << "Failed to extract features for screw images.\n";
         return;
     }
@@ -338,7 +338,7 @@ int main(int argc, char* argv[]){
     miw->addImage("Binary Image", pre);
     miw->addImage("Result", inputImageClone);
     miw->render();
-    cv::waitKey(5000);
+    cv::waitKey();
 
     return 0;
 }

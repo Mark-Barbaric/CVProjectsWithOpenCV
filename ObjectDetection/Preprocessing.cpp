@@ -1,5 +1,4 @@
 #include "Preprocessing.h"
-#include <opencv2/imgcodecs.hpp>
 
 namespace ObjectDetection{
 

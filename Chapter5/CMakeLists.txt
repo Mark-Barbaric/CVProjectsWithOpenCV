@@ -11,3 +11,6 @@ target_link_libraries(Chapter5 PUBLIC
         ObjectDetection
         OpenCVHelpers
         )
+
+target_include_directories(Chapter5 PUBLIC
+        "${CMAKE_BINARY_DIR}/lib")
