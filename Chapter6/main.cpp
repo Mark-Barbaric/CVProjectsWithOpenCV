@@ -342,7 +342,7 @@ int main(int argc, char* argv[]){
     miw->addImage("Binary Image", pre);
     miw->addImage("Result", inputImageClone);
     miw->render();
-    cv::waitKey(5000);
+    cv::waitKey(0);
 
     return 0;
 }
