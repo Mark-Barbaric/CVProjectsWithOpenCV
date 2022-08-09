@@ -2,79 +2,49 @@
 
 namespace ObjectDetection{
 
-    cv::Mat Preprocessing::calculateLightPattern(const cv::Mat& image) {
+    cv::Mat Preprocessing::CalculateLightPattern(const cv::Mat& image) {
         cv::Mat pattern;
         cv::blur(image, pattern, cv::Size(image.cols / 3, image.cols / 3));
         return pattern;
     }
 
-    cv::Mat Preprocessing::removeNoise(const cv::Mat& image) {
-        cv::Mat imageGreyscale;
-        cv::cvtColor(image, imageGreyscale, cv::COLOR_BGR2GRAY);
+    cv::Mat Preprocessing::RemoveNoise(cv::Mat input) {
+
+        if(input.channels() == 3){
+            cv::cvtColor(input, input, cv::COLOR_BGR2GRAY);
+        }
+
         cv::Mat imageNoise;
-        cv::medianBlur(imageGreyscale, imageNoise, 3);
-        cv::blur(imageGreyscale, imageNoise, cv::Size(3,3));
+        cv::medianBlur(input, imageNoise, 3);
         return imageNoise;
     }
 
-    cv::Mat Preprocessing::removeLight(const cv::Mat &image, const cv::Mat& lightPattern, LightDifferenceMethod difference) {
+    cv::Mat Preprocessing::RemoveLight(cv::Mat image, cv::Mat lightPattern) {
         cv::Mat aux;
-        switch(difference){
-            case LightDifferenceMethod::Division: {
-                cv::Mat img32, pattern32;
-                cv::Mat imageCopy = image.clone(), lightPatternCopy = lightPattern.clone();
-                imageCopy.convertTo(img32, CV_32F);
-                lightPatternCopy.convertTo(pattern32, CV_32F);
-                aux = 1 - (img32 / pattern32);
-                aux.convertTo(aux, CV_8U, 255);
-                break;
-            }
-            case LightDifferenceMethod::Difference:{
-                aux = lightPattern - image;
-                break;
-            }
-
-            default:{
-                break;
-            }
-
-        }
+        cv::Mat img32, pattern32;
+        image.convertTo(img32, CV_32F);
+        lightPattern.convertTo(pattern32, CV_32F);
+        aux = 1 - (img32 / pattern32);
+        aux.convertTo(aux, CV_8U, 255);
         return aux;
     }
 
-    cv::Mat Preprocessing::applyLightPattern(const cv::Mat& image, const cv::Mat& imageNoise, LightDifferenceMethod method) {
-
-        cv::Mat lightPattern = calculateLightPattern(image);
-        cv::medianBlur(lightPattern, lightPattern, 3);
-        cv::Mat imageNoLight;
-        imageNoise.copyTo(imageNoLight);
-        imageNoLight = removeLight(imageNoise, lightPattern, method);
-        return imageNoLight;
-    }
-
-    cv::Mat Preprocessing::binarizeImage(const cv::Mat &imageNoLight, LightDifferenceMethod method) {
+    cv::Mat Preprocessing::BinarizeImage(const cv::Mat& imageNoLight) {
         cv::Mat imageThreshold;
-
-        if(method == LightDifferenceMethod::None){
-            cv::threshold(imageNoLight, imageThreshold, 150, 255, cv::THRESH_BINARY_INV);
-        } else {
-            cv::threshold(imageNoLight, imageThreshold, 30, 255, cv::THRESH_BINARY);
-        }
-
+        cv::threshold(imageNoLight, imageThreshold, 150, 255, cv::THRESH_BINARY_INV);
         return imageThreshold;
     }
 
-    cv::Mat Preprocessing::Preprocess(const cv::Mat &input) {
+    cv::Mat Preprocessing::Preprocess(cv::Mat input) {
 
-        if(input.channels() == 1){
-            throw std::logic_error("Can't preprocess grayscale image.");
+        if(input.channels() == 3){
+            cv::cvtColor(input, input, cv::COLOR_BGR2GRAY);
         }
 
-        cv::Mat inputCopy, inputCopyGrayscale;
-        inputCopy = input.clone();
-        cv::cvtColor(inputCopy, inputCopyGrayscale, cv::COLOR_BGR2GRAY);
-        const auto imageNoise = removeNoise(inputCopy);
-        const auto imageWithoutLight = applyLightPattern(inputCopyGrayscale, imageNoise, ObjectDetection::LightDifferenceMethod::Division);
-        return binarizeImage(imageWithoutLight, ObjectDetection::LightDifferenceMethod::Division);
+        cv::Mat imageNoise = RemoveNoise(input);
+        cv::Mat lightPattern = CalculateLightPattern(imageNoise);
+        cv::Mat imageWithoutLight = RemoveLight(imageNoise, lightPattern);
+        cv::Mat binarizedImage = BinarizeImage(imageWithoutLight);
+        return binarizedImage;
     }
 }

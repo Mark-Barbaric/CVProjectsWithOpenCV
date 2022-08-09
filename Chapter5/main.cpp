@@ -40,16 +40,16 @@ int main(int argc, char* argv[])
     cv::imshow("Image Before" , image);
 
     cv::Mat imageGreyscale, imageNoise, imageWithoutLight, imageThreshold;
-    const auto lightDetectionMethod = ObjectDetection::LightDifferenceMethod::Division;
 
     try{
-        imageGreyscale = cv::imread(imageFile, cv::IMREAD_GRAYSCALE);
-        imageNoise = ObjectDetection::Preprocessing::removeNoise(image);
-        imageWithoutLight = ObjectDetection::Preprocessing::applyLightPattern(imageGreyscale, imageNoise, lightDetectionMethod);
-        imageThreshold = ObjectDetection::Preprocessing::binarizeImage(imageWithoutLight, lightDetectionMethod);
+        imageGreyscale = cv::imread(imageFile, cv::IMREAD_COLOR);
+        imageNoise = ObjectDetection::Preprocessing::RemoveNoise(image);
+        imageWithoutLight = ObjectDetection::Preprocessing::RemoveLight(imageGreyscale, imageNoise);
+        imageThreshold = ObjectDetection::Preprocessing::BinarizeImage(imageWithoutLight);
     } catch(const std::exception& e){
         std::cout << e.what() << ".\n";
     }
+
     cv::imshow("Image Greyscale" , imageGreyscale);
     cv::imshow("Image Noise" , imageNoise);
     cv::imshow("Image Without Light" , imageWithoutLight);

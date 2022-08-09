@@ -12,19 +12,14 @@
 
 namespace ObjectDetection{
 
-    enum class OBJECT_DETECTION_API  LightDifferenceMethod : char {
-        Division = 0, Difference, None
-    };
-
     class OBJECT_DETECTION_API Preprocessing{
-        static cv::Mat calculateLightPattern(const cv::Mat& image);
-        static cv::Mat removeLight(const cv::Mat& image, const cv::Mat& lightPattern, LightDifferenceMethod difference);
+        static cv::Mat CalculateLightPattern(const cv::Mat& image);
     public:
         Preprocessing() = default;
-        static cv::Mat removeNoise(const cv::Mat& image);
-        static cv::Mat applyLightPattern(const cv::Mat& image, const cv::Mat& imageNoise, LightDifferenceMethod difference);
-        static cv::Mat binarizeImage(const cv::Mat& image, LightDifferenceMethod difference);
-        static cv::Mat Preprocess(const cv::Mat& image);
+        static cv::Mat RemoveNoise(cv::Mat image);
+        static cv::Mat RemoveLight(cv::Mat image, cv::Mat lightPattern);
+        static cv::Mat BinarizeImage(const cv::Mat& image);
+        static cv::Mat Preprocess(cv::Mat image);
 
     };
 }

@@ -21,7 +21,9 @@ constexpr auto TrainingDataPrefix = "/home/markbarbaric/Documents/Mirriad/Develo
 #endif
 
 // extracts the area and aspect ratio
-std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image, std::vector<int>* left = nullptr, std::vector<int>* top = nullptr){
+std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image,
+                                                std::vector<int>* left = nullptr, std::vector<int>* top = nullptr,
+                                                float threshold = 500.0f){
     std::vector<std::vector<float>> output;
     std::vector<std::vector<cv::Point>> contours;
     cv::Mat input = image.clone();
@@ -42,7 +44,7 @@ std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelper
         cv::Scalar areaS = cv::sum(mask);
         float area = areaS[0];
 
-        if(area > 500){
+        if(area > threshold){
             cv::RotatedRect r = cv::minAreaRect(contours[i]);
             const float width = r.size.width;
             const float height = r.size.height;
@@ -251,6 +253,8 @@ void trainAndTest(cv::Ptr<cv::ml::SVM>& svm,
     }else{
         plotTrainData(window, trainingDataMat, responses);
     }
+
+    cv::waitKey(10000);
 }
 
 int main(int argc, char* argv[]){
@@ -338,7 +342,7 @@ int main(int argc, char* argv[]){
     miw->addImage("Binary Image", pre);
     miw->addImage("Result", inputImageClone);
     miw->render();
-    cv::waitKey();
+    cv::waitKey(5000);
 
     return 0;
 }
