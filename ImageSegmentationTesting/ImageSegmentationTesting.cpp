@@ -65,6 +65,6 @@ int main(int argc, char** argv){
     });
 
     multipleImageWindow->render();
-    cv::waitKey();
+    cv::waitKey(10000);
     return 0;
 }
