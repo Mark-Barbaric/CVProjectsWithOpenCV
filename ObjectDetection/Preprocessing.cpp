@@ -31,7 +31,7 @@ namespace ObjectDetection{
 
     cv::Mat Preprocessing::BinarizeImage(const cv::Mat& imageNoLight) {
         cv::Mat imageThreshold;
-        cv::threshold(imageNoLight, imageThreshold, 30, 255, cv::THRESH_BINARY);
+        cv::threshold(imageNoLight, imageThreshold, 30, 255, cv::THRESH_BINARY_INV);
         return imageThreshold;
     }
 

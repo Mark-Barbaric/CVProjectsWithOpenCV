@@ -13,7 +13,7 @@ const char* keys = {
 };
 
 #ifdef WIN32
-constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\TrainingData\)";
+constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Data\Chapter6\Training\)";
 #endif
 
 #ifdef linux
@@ -92,8 +92,6 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
 
         cv::Mat preprocessedImage;
 
-        const auto numChannels = frame.channels();
-
         try {
             preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
         } catch(const std::exception& e){
@@ -171,8 +169,8 @@ void plotTrainData(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& shar
         }
         else if(label==2) {
             color = OpenCVHelpers::GeneralHelpers::red; // SCREW
-            circle(plot, cv::Point(x, y), 3, color, -1, 8);
         }
+        circle(plot, cv::Point(x, y), 3, color, -1, 8);
     }
 
     if(error){
@@ -274,16 +272,7 @@ int main(int argc, char* argv[]){
 
     const auto miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
 
-    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-    std::cout << "Training and testing SVM Model.\n";
-    try{
-        trainAndTest(svm, miw);
-    } catch(const std::exception& e){
-        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
-        return 1;
-    }
-
-    const auto inputImageFilePath = cli.get<cv::String>(0);
+    const auto inputImageFilePath = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Data\Chapter6\Testing\screw-bolt-nut.jpg)";
     cv::Mat inputImage = cv::imread(inputImageFilePath, cv::IMREAD_COLOR);
 
     if(inputImage.data == nullptr){
@@ -291,12 +280,10 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    cv::Mat inputImageClone = inputImage.clone();
-
     cv::Mat pre;
     std::cout << "Preprocessing input image.\n";
     try{
-        pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
+        pre = ObjectDetection::Preprocessing::Preprocess(inputImage);
     } catch(const std::exception& e){
         std::cout << "Failed to preprocess image with error: " << e.what() << "\n.";
         return 1;
@@ -307,6 +294,17 @@ int main(int argc, char* argv[]){
 
     if(features.empty()){
         std::cout << "Failed to extract features from source image \n.";
+        return 1;
+    }
+
+    // create SVM Model
+
+    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+    std::cout << "Training and testing SVM Model.\n";
+    try{
+        trainAndTest(svm, miw);
+    } catch(const std::exception& e){
+        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
         return 1;
     }
 
@@ -331,7 +329,7 @@ int main(int argc, char* argv[]){
 
         std::cout << "Image classified as :" << ss.str() << ".\n";
 
-        cv::putText(inputImageClone, ss.str(),
+        cv::putText(inputImage, ss.str(),
                     cv::Point2d(posLeft[i], posTop[i]),
                     cv::FONT_HERSHEY_SIMPLEX,
                     0.4,
@@ -340,7 +338,7 @@ int main(int argc, char* argv[]){
     }
 
     miw->addImage("Binary Image", pre);
-    miw->addImage("Result", inputImageClone);
+    miw->addImage("Result", inputImage);
     miw->render();
     cv::waitKey(0);
 
