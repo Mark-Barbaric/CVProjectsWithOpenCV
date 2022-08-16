@@ -13,7 +13,7 @@ const char* keys = {
 };
 
 #ifdef WIN32
-constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\TrainingData\)";
+constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Data\Chapter6\Training\)";
 #endif
 
 #ifdef linux
@@ -21,7 +21,9 @@ constexpr auto TrainingDataPrefix = "/home/markbarbaric/Documents/Mirriad/Develo
 #endif
 
 // extracts the area and aspect ratio
-std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image, std::vector<int>* left = nullptr, std::vector<int>* top = nullptr){
+std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image,
+                                                std::vector<int>* left = nullptr, std::vector<int>* top = nullptr,
+                                                float threshold = 500.0f){
     std::vector<std::vector<float>> output;
     std::vector<std::vector<cv::Point>> contours;
     cv::Mat input = image.clone();
@@ -42,7 +44,7 @@ std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelper
         cv::Scalar areaS = cv::sum(mask);
         float area = areaS[0];
 
-        if(area > 500){
+        if(area > threshold){
             cv::RotatedRect r = cv::minAreaRect(contours[i]);
             const float width = r.size.width;
             const float height = r.size.height;
@@ -167,8 +169,8 @@ void plotTrainData(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& shar
         }
         else if(label==2) {
             color = OpenCVHelpers::GeneralHelpers::red; // SCREW
-            circle(plot, cv::Point(x, y), 3, color, -1, 8);
         }
+        circle(plot, cv::Point(x, y), 3, color, -1, 8);
     }
 
     if(error){
@@ -249,6 +251,8 @@ void trainAndTest(cv::Ptr<cv::ml::SVM>& svm,
     }else{
         plotTrainData(window, trainingDataMat, responses);
     }
+
+    cv::waitKey(10000);
 }
 
 int main(int argc, char* argv[]){
@@ -268,16 +272,7 @@ int main(int argc, char* argv[]){
 
     const auto miw = std::make_shared<OpenCVHelpers::MultipleImageWindow>("Main window", cv::WINDOW_AUTOSIZE);
 
-    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-    std::cout << "Training and testing SVM Model.\n";
-    try{
-        trainAndTest(svm, miw);
-    } catch(const std::exception& e){
-        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
-        return 1;
-    }
-
-    const auto inputImageFilePath = cli.get<cv::String>(0);
+    const auto inputImageFilePath = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Data\Chapter6\Testing\screw-bolt-nut.jpg)";
     cv::Mat inputImage = cv::imread(inputImageFilePath, cv::IMREAD_COLOR);
 
     if(inputImage.data == nullptr){
@@ -285,12 +280,10 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    cv::Mat inputImageClone = inputImage.clone();
-
     cv::Mat pre;
     std::cout << "Preprocessing input image.\n";
     try{
-        pre = ObjectDetection::Preprocessing::Preprocess(inputImageClone);
+        pre = ObjectDetection::Preprocessing::Preprocess(inputImage);
     } catch(const std::exception& e){
         std::cout << "Failed to preprocess image with error: " << e.what() << "\n.";
         return 1;
@@ -301,6 +294,17 @@ int main(int argc, char* argv[]){
 
     if(features.empty()){
         std::cout << "Failed to extract features from source image \n.";
+        return 1;
+    }
+
+    // create SVM Model
+
+    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+    std::cout << "Training and testing SVM Model.\n";
+    try{
+        trainAndTest(svm, miw);
+    } catch(const std::exception& e){
+        std::cout << "Failed to train and test SVM Model with error: " << e.what() << "\n.";
         return 1;
     }
 
@@ -325,7 +329,7 @@ int main(int argc, char* argv[]){
 
         std::cout << "Image classified as :" << ss.str() << ".\n";
 
-        cv::putText(inputImageClone, ss.str(),
+        cv::putText(inputImage, ss.str(),
                     cv::Point2d(posLeft[i], posTop[i]),
                     cv::FONT_HERSHEY_SIMPLEX,
                     0.4,
@@ -334,9 +338,9 @@ int main(int argc, char* argv[]){
     }
 
     miw->addImage("Binary Image", pre);
-    miw->addImage("Result", inputImageClone);
+    miw->addImage("Result", inputImage);
     miw->render();
-    cv::waitKey();
+    cv::waitKey(0);
 
     return 0;
 }
