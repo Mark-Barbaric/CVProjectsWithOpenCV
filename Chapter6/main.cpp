@@ -90,8 +90,6 @@ bool readFolderAndExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleIma
 
         cv::Mat preprocessedImage;
 
-        const auto numChannels = frame.channels();
-
         try {
             preprocessedImage = ObjectDetection::Preprocessing::Preprocess(frame);
         } catch(const std::exception& e){
