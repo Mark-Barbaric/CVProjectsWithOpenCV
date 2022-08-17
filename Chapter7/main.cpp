@@ -40,13 +40,36 @@ int main(int argc, char** argv){
     cv::Mat grayMaskSmall, grayMaksSmallThresh, grayMaskSmallThreshInv;
     cv::Mat maskedFace, maskedFrame;
 
-    cv::VideoCapture cap(0);
+    cv::VideoCapture videoCapture(0);
 
-    if(!cap.isOpened()){
+    if(!videoCapture.isOpened()){
         std::cerr << "Failed to load webcam.\n";
         return -1;
     }
 
+    cv::namedWindow("Frame");
+    float scalingFactor = 0.75f;
+
+    std::vector<cv::Rect> faces;
+
+    while(true){
+
+        videoCapture >> frame;
+        try{
+            cv::resize(frame, frame, cv::Size(), scalingFactor, scalingFactor, cv::INTER_AREA);
+
+            cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
+
+            cv::equalizeHist(frameGray, frameGray);
+
+        } catch(const std::exception& e){
+            std::cout << "Failed to apply mask to frame with error: " << e.what() << "\n";
+            return 1;
+        }
+        if(cv::waitKey(30) == 27){
+            break;
+        }
+    }
 
     return 0;
 }
