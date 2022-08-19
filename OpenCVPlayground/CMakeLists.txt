@@ -8,5 +8,7 @@ conan_basic_setup(TARGETS)
 set(SOURCES main.cpp Objects/Ball.h Objects/Color.h)
 add_executable(OpenCVPlayground ${SOURCES})
 
+target_include_directories(OpenCVPlayground PUBLIC ${CMAKE_BINARY_DIR}/lib)
+
 target_link_libraries(OpenCVPlayground
         CONAN_PKG::opencv)

@@ -7,12 +7,13 @@ conan_basic_setup(TARGETS)
 
 add_executable(Chapter6 main.cpp)
 
+target_include_directories(Chapter6 PUBLIC
+        "${CMAKE_BINARY_DIR}/lib")
+
 target_link_libraries(Chapter6 PUBLIC
         CONAN_PKG::opencv
         ObjectDetection
         OpenCVHelpers
         )
 
-target_include_directories(Chapter6 PUBLIC
-        "${CMAKE_BINARY_DIR}/lib")
 

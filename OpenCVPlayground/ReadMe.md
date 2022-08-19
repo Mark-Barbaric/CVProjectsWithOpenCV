@@ -1,3 +1,3 @@
-# Casual Gamer
+# OpenCV Playground
 
-## Repo containing source code for Youtube tutorials from Casual Gamer channel.
+Repo containing source code for some general OpenCV Practice.
