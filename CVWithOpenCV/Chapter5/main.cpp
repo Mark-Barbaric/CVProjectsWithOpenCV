@@ -1,9 +1,8 @@
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-#include <ObjectDetection/Preprocessing.h>
-#include <ObjectDetection/Segmentation.h>
-#include <OpenCVHelpers/MultipleImageWindow.h>
+#include <lib/ObjectDetection/Preprocessing.h>
+#include <lib/ObjectDetection/Segmentation.h>
 
 //https://github.com/PacktPublishing/Building-Computer-Vision-Projects-with-OpenCV4-and-CPlusPlus/blob/master/Chapter05/main.cpp
 constexpr auto imageFolder = "/Users/markbarbaric/Documents/Developer/CPP/OpenCV/CVProjectsWithOpenCV/Images/";

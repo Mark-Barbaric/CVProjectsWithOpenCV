@@ -5,7 +5,7 @@
 #include <iostream>
 
 #ifdef _WIN32
-constexpr auto RESOURCE_FILE_PATH = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Chapter7\Resources\)";
+constexpr auto RESOURCE_FILE_PATH = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\CVWithOpenCV\Chapter7\Resources\)";
 #endif
 
 int main(int argc, char** argv){
@@ -37,7 +37,7 @@ int main(int argc, char** argv){
 
     cv::Mat frame, frameGray;
     cv::Mat frameROI, faceMaskSmall;
-    cv::Mat grayMaskSmall, grayMaksSmallThresh, grayMaskSmallThreshInv;
+    cv::Mat grayMaskSmall, grayMaskSmallThresh, grayMaskSmallThreshInv;
     cv::Mat maskedFace, maskedFrame;
 
     cv::VideoCapture videoCapture(0);
@@ -62,10 +62,39 @@ int main(int argc, char** argv){
 
             cv::equalizeHist(frameGray, frameGray);
 
+            faceCascade.detectMultiScale(frameGray, faces, 1.1, 2,
+                                         0| cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
+
+            for(const auto& face : faces){
+
+                cv::Rect rect(face.x, face.y, face.width, face.height);
+
+                const auto x = face.x - static_cast<int>(0.1 * face.width);
+                const auto y = face.y - static_cast<int>(0.1 * face.height);
+                const auto w = static_cast<int>(1.1 * face.width);
+                const auto h = static_cast<int>(1.3 * face.height);
+
+                frameROI = frame(cv::Rect(x, y, w, h));
+                cv::resize(faceMask, faceMaskSmall, cv::Size(w, h));
+                cv::cvtColor(faceMaskSmall, grayMaskSmall, cv::COLOR_BGR2GRAY);
+                cv::threshold(grayMaskSmall, grayMaskSmallThresh, 230, 255, cv::THRESH_BINARY_INV);
+                cv::bitwise_not(grayMaskSmallThresh, grayMaskSmallThreshInv);
+                cv::bitwise_and(faceMaskSmall, faceMaskSmall, maskedFace, grayMaskSmallThresh);
+                cv::bitwise_and(frameROI, frameROI, maskedFrame, grayMaskSmallThresh);
+
+                if(x > 0 && y > 0 && x + w < frame.cols && y + h < frame.rows){
+                    cv::add(maskedFace, maskedFrame, frame(cv::Rect(x,y,w,h)));
+                }
+
+            }
+
         } catch(const std::exception& e){
             std::cout << "Failed to apply mask to frame with error: " << e.what() << "\n";
             return 1;
         }
+
+        cv::imshow("Frame", frame);
+
         if(cv::waitKey(30) == 27){
             break;
         }

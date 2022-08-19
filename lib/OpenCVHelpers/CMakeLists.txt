@@ -10,8 +10,3 @@ conan_basic_setup(TARGETS)
 
 target_link_libraries(OpenCVHelpers
         CONAN_PKG::opencv)
-
-set_target_properties(OpenCVHelpers PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/lib"
-        )

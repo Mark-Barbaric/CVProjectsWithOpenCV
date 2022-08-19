@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../platformAPIDefs.h"
+#include "platformAPIDefs.h"
 
 #ifndef OBJECT_DETECTION_EXPORT
 #define OBJECT_DETECTION_API PLATFORM_DLL_EXPORT

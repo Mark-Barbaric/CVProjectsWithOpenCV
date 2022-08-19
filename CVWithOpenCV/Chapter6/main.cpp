@@ -1,9 +1,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-#include <ObjectDetection/Preprocessing.h>
-#include <ObjectDetection/Segmentation.h>
-#include <OpenCVHelpers/MultipleImageWindow.h>
-#include <OpenCVHelpers/GeneralHelpers.h>
+#include <lib/ObjectDetection/Preprocessing.h>
+#include <lib/ObjectDetection/Segmentation.h>
+#include <lib/OpenCVHelpers/MultipleImageWindow.h>
+#include <lib/OpenCVHelpers/GeneralHelpers.h>
 #include <iostream>
 #include <opencv2/ml.hpp>
 
@@ -13,7 +13,7 @@ const char* keys = {
 };
 
 #ifdef WIN32
-constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\Data\Chapter6\Training\)";
+constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Developer\CPP\OpenCV\CVProjectsWithOpenCV\CVWithOpenCV\Data\Chapter6\Training\)";
 #endif
 
 #ifdef linux
