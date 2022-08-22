@@ -3,11 +3,11 @@
 #include <vector>
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
-#include "Objects/Ball.h"
+#include "Shape.h"
 
-void getBalls(cv::Mat& img, Objects::Color color, std::vector<Objects::Ball>& balls){
+void getBalls(cv::Mat& img, Objects::Color color, std::vector<Objects::Shape>& balls){
 
-    Objects::Ball ball (color);
+    Objects::Shape ball (color);
     cv::Mat mask;
     cv::inRange(img, ball.getLowMaskScalar(), ball.getHighMaskScalar(), mask);
 
@@ -22,7 +22,7 @@ void getBalls(cv::Mat& img, Objects::Color color, std::vector<Objects::Ball>& ba
     }
 }
 
-void drawBalls(cv::Mat& background, std::vector<Objects::Ball>& balls){
+void drawBalls(cv::Mat& background, std::vector<Objects::Shape>& balls){
 
     for(const auto& ball : balls){
 
@@ -49,19 +49,9 @@ void drawBalls(cv::Mat& background, std::vector<Objects::Ball>& balls){
     }
 }
 
-struct HandleGuard{
-
-    HWND m_handle {nullptr};
-
-    explicit HandleGuard(HWND handle):m_handle(handle){
-
-    }
-
-    ~HandleGuard(){
-        CloseHandle(m_handle);
-        m_handle = nullptr;
-    };
-};
+void runPurpleTest(){
+    // https://stackoverflow.com/questions/29331666/hsv-color-detection-with-opencv
+}
 
 int main(int argc, char** argv) {
 
@@ -95,7 +85,7 @@ int main(int argc, char** argv) {
 
     cv::waitKey(30);
 
-    std::vector<Objects::Ball> balls;
+    std::vector<Objects::Shape> balls;
 
     while(cv::waitKey(0) != 27){
 

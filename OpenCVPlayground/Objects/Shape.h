@@ -4,7 +4,7 @@
 
 namespace Objects{
     
-    class Ball{
+    class Shape{
 
         Color m_color;
         cv::Rect m_bounds;
@@ -12,7 +12,7 @@ namespace Objects{
 
     public:
 
-        explicit Ball(Color color)
+        explicit Shape(Color color)
         :m_color(color)
         {
             m_colorThreshold = getColorThreshold(color);

@@ -4,13 +4,6 @@ namespace Objects {
         Yellow = 0, Blue, Red, Green, Purple
     };
 
-    inline cv::Scalar getColorScalar(Color type){
-        switch(type){
-            default:
-                return cv::Scalar(0,0,0);
-        }
-    }
-
     struct ColorThreshold {
 
         cv::Scalar m_low;
