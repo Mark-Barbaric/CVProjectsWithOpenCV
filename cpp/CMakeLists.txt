@@ -32,6 +32,7 @@ conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(lib)
 add_subdirectory(CVWithOpenCVBook)

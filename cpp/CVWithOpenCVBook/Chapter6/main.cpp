@@ -20,6 +20,10 @@ constexpr auto TrainingDataPrefix = R"(C:\Users\mark.barbaric\Documents\Develope
 constexpr auto TrainingDataPrefix = "/home/markbarbaric/Documents/Mirriad/Developer/cpp/CVProjectsWithOpenCV/";
 #endif
 
+#ifdef __APPLE__
+constexpr char* TrainingDataPrefix = "/Users/markbarbaric/Documents/Developer/ComputerVision/OpenCV/CVProjectsWithOpenCV/cpp/TrainingData";
+#endif
+
 // extracts the area and aspect ratio
 std::vector<std::vector<float>> ExtractFeatures(const std::weak_ptr<OpenCVHelpers::MultipleImageWindow>& sharedWindow, cv::Mat image,
                                                 std::vector<int>* left = nullptr, std::vector<int>* top = nullptr,
